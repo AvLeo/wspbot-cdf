@@ -1,13 +1,22 @@
 const qrcode = require('qrcode-terminal');
+const fetch = require('node-fetch');
 
-const { Client } = require('whatsapp-web.js');
-const client = new Client();
+const { Client , LocalAuth} = require('whatsapp-web.js');
+
+
+const client = new Client({
+    authStrategy: new LocalAuth()
+})
+
+const { cel , redes} = require('./data.json')
+const { chat } = require('./chats.json')
 
 client.on('qr', (qr) => {
     qrcode.generate(qr, { small: true });
 });
 
-client.on('ready', () => {
+client.on('ready',async () => {
+    await client.sendMessage("5492644709107@c.us","Inicie bot casita");
     console.log('Client is ready!');
 });
 
@@ -42,9 +51,58 @@ client.on('ready', () => {
 */
 
 
-client.on('message', (msg) => {
-    
+client.on('message', async (message) => {
 
+    const from = message.from
+    
+    if(from.includes('@g.us')) return 
+
+    const chats = JSON.parse(JSON.stringify(chat))
+    const text = message.body.toLowerCase()
+    
+    const isInit = chats.find( chat => chat.numero === from)
+    const id = chats.findIndex( chat => chat.numero === from )
+
+    let ctx;
+
+    if(isInit !== "undefined"){
+        ctx = isInit;
+    }else{
+        ctx = {
+            "numero": from,
+            "state": {
+                "freq": false,
+                "certificado": false,
+                "asistencia": false
+            }
+        }
+        // chat.push(ctx)
+
+    }
+
+    if(ctx.state.freq){
+        // freq() 
+        return
+    }
+
+    if(ctx.state.certificado){
+        // certificado
+        return
+    }
+
+    if(ctx.state.asistencia){
+        // asistencia()
+        return
+    }
+
+    if(text === '1' || text === '2' || text === '3'){
+        // flujoInicial()
+        return
+    }
+    client.sendMessage(from,"Hola soy el Asistente Virtual de Casa del Futuro 😊. \n\n Estoy para ayudar con los siguiente comandos:")
+    client.sendMessage(from,"🔹1 - Preguntas frecuentes \n 🔹2 - estado de certificado \n 🔹3 - Asistencia del personal")
+    console.log(JSON.parse(chat))
 })
 
 client.initialize();
+
