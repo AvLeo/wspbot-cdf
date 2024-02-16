@@ -1,0 +1,13 @@
+{
+    "chat" :[
+        {
+            "numero": "",
+            "state": {
+                "freq": false,
+                "certificado": false,
+                "asistencia": false
+            }
+        }
+        
+    ]
+}
