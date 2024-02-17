@@ -1,8 +1,10 @@
 const qrcode = require('qrcode-terminal');
-const fetch = require('node-fetch');
 
 const { Client , LocalAuth} = require('whatsapp-web.js');
 
+const { initialFLow } = require('./Commands/flujoInicial.js')
+const { getResFreq } = require('./Commands/resFreq.js')
+const { getResCert } = require('./Commands/resCert.js')
 
 const client = new Client({
     authStrategy: new LocalAuth()
@@ -57,15 +59,16 @@ client.on('message', async (message) => {
     
     if(from.includes('@g.us')) return 
 
+    if(from === `5492644709107@c.us`){
+
     const chats = JSON.parse(JSON.stringify(chat))
     const text = message.body.toLowerCase()
     
     const isInit = chats.find( chat => chat.numero === from)
-    const id = chats.findIndex( chat => chat.numero === from )
 
     let ctx;
 
-    if(isInit !== "undefined"){
+    if(typeof(isInit) !== "undefined"){
         ctx = isInit;
     }else{
         ctx = {
@@ -76,32 +79,43 @@ client.on('message', async (message) => {
                 "asistencia": false
             }
         }
-        // chat.push(ctx)
+        chat.push(ctx)
 
     }
 
+    const id = chats.findIndex( chat => chat.numero === from )
+
     if(ctx.state.freq){
-        // freq() 
-        return
+        const res = getResFreq(text)
+        console.log('llegué acá')
+        console.log(chat)
+        await client.sendMessage(from,res)
+        text === '9' ? chat[id].state.freq = false : false
+        fs.writeFile('chats.json',JSON.stringify(chat))
+        return 
     }
 
     if(ctx.state.certificado){
-        // certificado
+        const res = getResCert(text)
+        console.log(chat)
         return
     }
 
     if(ctx.state.asistencia){
-        // asistencia()
-        return
+        return console.log("${from} - En espera de respuesta del personal!")
     }
 
     if(text === '1' || text === '2' || text === '3'){
-        // flujoInicial()
+        const res = initialFLow(text,chat,id)
+        await client.sendMessage(from,res[0])
+        console.log(chat)
         return
     }
     client.sendMessage(from,"Hola soy el Asistente Virtual de Casa del Futuro 😊. \n\n Estoy para ayudar con los siguiente comandos:")
     client.sendMessage(from,"🔹1 - Preguntas frecuentes \n 🔹2 - estado de certificado \n 🔹3 - Asistencia del personal")
-    console.log(JSON.parse(chat))
+    fs.writeFile('chats.json',JSON.stringify(chat))
+    console.log(chat)
+    }
 })
 
 client.initialize();
