@@ -5,7 +5,14 @@
             "state": {
                 "freq": false,
                 "certificado": false,
-                "asistencia": false
+                "edp":{
+                    "main": false,
+                    "asistencia": false
+                },
+                "cdf":{
+                    "main": false,
+                    "asistencia": false
+                }
             }
         }
         

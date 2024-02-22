@@ -1,10 +1,12 @@
 const qrcode = require('qrcode-terminal');
-
+const fs = require('fs')
 const { Client , LocalAuth} = require('whatsapp-web.js');
 
 const { initialFLow } = require('./Commands/flujoInicial.js')
 const { getResFreq } = require('./Commands/resFreq.js')
 const { getResCert } = require('./Commands/resCert.js')
+const { getResEDP } = require('./Commands/resEDP.js')
+const { getResCDF } = require('./Commands/resCDF.js')
 
 const client = new Client({
     authStrategy: new LocalAuth()
@@ -26,7 +28,7 @@ client.on('ready',async () => {
     Esquema de mensajes:
                         Inicio:
                             - "Hola soy el Asistente Virtual de Casa del Futuro 😊. \n\n Estoy para ayudar con los siguiente comandos:"
-                            - " 1 - Preguntas frecuentes \n 2 - estado de certificado \n 3 - Asistencia del personal"
+                            - " 1 - Preguntas frecuentes \n 2 - estado de certificado \n 3 - Asistencia del personal \n 4 - Registrar Asistencia"
                         INPUT 1: 
                                 - "🔹 1 - Cursos \n 🔹 2 - Inscripciones \n 🔹 3 - Certificados \n 🔹 4 - Metodoligia de cursado \n 🔹 5 - Duración de cursos \n 🔹 6 - Costo de cursado \n 🔹 7 - Escuela de Programación \n 🔹 8 - Redes \n"
                         INPUT 2:
@@ -47,19 +49,57 @@ client.on('ready',async () => {
                         INPUT 3:
                                 - " Estás siendo redirigido con el personal de Casa del Futuro!"
                                 - " En breves serás atendido, espera unos minutos porfavor! Gracias por charlar conmigo un ratito 😒 "
+                        
+                        INPUT 4:
+                                -  "1 - ASDASDASD \n 1 - ASDASDASD \n 1 - ASDASDASD \n 1 - ASDASDASD \n 1 - ASDASDASD \n 1 - ASDASDASD \n 1 - ASDASDASD" (fetch sheet)
+                                - "Indicame tu curso"
+                            
+                                INPUT CURSO : 
+                                            -"Indica tu pin de curso" (fetch sheet pin == ingresado)
 
+///
+
+🔹1 - Preguntas frecuentes 
+🔹2 - Estado de certificado 
+🔹3 - Casa del Futuro 
+🔹4 - Escuela de Programación 
+🔹5 - Redes de contacto
+
+
+CASA del FUTURO:
+🔹1 - Talleres(horarios de cursado, metodología, duración, costo) 
+🔹2 - Preinscripciones
+🔹3 - Atención personal
+🔹4 - Volver al menú inicial
+
+
+Escuela de Programación:
+🔹1 - Cursos(horarios de cursado, metodología, duración, costo) 
+🔹2 - Preinscripciones
+🔹3 - Atención personal
+🔹4 - Volver al menú inicial
+
+///                                    
+// LOS PROFES ANTES DE INGRESAR AL CURSO GENEREN PIN NUEVO pin() - actualiza los pines - y si alumno uso el pin lo borre desde el sheet
+
+
+
+
+// Lógica de asistencia
+
+   
 
 
 */
 
+const msjInicial = "🔹1 - Preguntas frecuentes \n🔹2 - Estado de certificado \n🔹3 - Casa del Futuro \n🔹4 - Escuela de Programación \n🔹5 - Redes de contacto"
 
 client.on('message', async (message) => {
+
 
     const from = message.from
     
     if(from.includes('@g.us')) return 
-
-    if(from === `5492644709107@c.us`){
 
     const chats = JSON.parse(JSON.stringify(chat))
     const text = message.body.toLowerCase()
@@ -76,7 +116,14 @@ client.on('message', async (message) => {
             "state": {
                 "freq": false,
                 "certificado": false,
-                "asistencia": false
+                "edp":{
+                    "main": false,
+                    "asistencia": false
+                },
+                "cdf":{
+                    "main": false,
+                    "asistencia": false
+                }
             }
         }
         chat.push(ctx)
@@ -87,35 +134,67 @@ client.on('message', async (message) => {
 
     if(ctx.state.freq){
         const res = getResFreq(text)
-        console.log('llegué acá')
-        console.log(chat)
         await client.sendMessage(from,res)
-        text === '9' ? chat[id].state.freq = false : false
-        fs.writeFile('chats.json',JSON.stringify(chat))
+        if(text === '9'){
+            await client.sendMessage(from,msjInicial)
+            chat[id].state.freq = false
+        } 
+        //fs.writeFile('chats.json',JSON.stringify(chat))
         return 
     }
 
     if(ctx.state.certificado){
         const res = getResCert(text)
-        console.log(chat)
+        chat[id].state.certificado = false
+        await client.sendMessage(from,res)
+        await client.sendMessage(from,msjInicial)
         return
     }
 
-    if(ctx.state.asistencia){
-        return console.log("${from} - En espera de respuesta del personal!")
+    if(ctx.state.edp.main){
+        if(ctx.state.edp.asistencia){
+            await client.sendMessage(from,"Solicitud para asistencia de Escuela de programación")
+            await client.sendMessage(from,"Espere unos minutos, ya será atendido por un asistente 😊")
+            return
+        }
+        const res = getResEDP(text)
+        await client.sendMessage(from,res)
+        if(text === '4'){
+            chat[id].state.edp.main = false
+            await client.sendMessage(from,msjInicial)
+            console.log(chat[id])
+        }
+        
+        return
+    }
+    
+    if(ctx.state.cdf.main){
+        if(ctx.state.cdf.asistencia){
+            await client.sendMessage(from,"Solicitud para asistencia de Escuela de programación")
+            await client.sendMessage(from,"Espere unos minutos, ya será atendido por un asistente 😊")
+            return
+        }
+        const res = getResCDF(text)
+        await client.sendMessage(from,res)
+        if(text === '4'){
+            chat[id].state.cdf.main = false
+            await client.sendMessage(from,msjInicial)
+            console.log(chat[id])
+        }
+        
+        return
     }
 
-    if(text === '1' || text === '2' || text === '3'){
+    if(text === '1' || text === '2' || text === '3' || text === '4' || text === '5'){
         const res = initialFLow(text,chat,id)
         await client.sendMessage(from,res[0])
-        console.log(chat)
+        console.log(chat[id])
         return
     }
+
     client.sendMessage(from,"Hola soy el Asistente Virtual de Casa del Futuro 😊. \n\n Estoy para ayudar con los siguiente comandos:")
-    client.sendMessage(from,"🔹1 - Preguntas frecuentes \n 🔹2 - estado de certificado \n 🔹3 - Asistencia del personal")
-    fs.writeFile('chats.json',JSON.stringify(chat))
-    console.log(chat)
-    }
+    client.sendMessage(from,msjInicial)
+    //fs.writeFile('chats.json',JSON.stringify(chat))
 })
 
 client.initialize();
