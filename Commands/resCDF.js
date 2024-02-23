@@ -4,16 +4,19 @@ const res3 = "🔹 3 - Atención personal "
 const res4 = "🔹 4 - Volver al menú principal" 
 
 
-const getResCDF = (msj) => {
+const getResCDF = (msj,chat,id) => {
     switch(msj){
         case '1':
-            return res1 
+            return [res1,chat] 
         case '2':
-            return res2 
+            return [res2,chat] 
         case '3':
-            return res3 
+            chat[id].state.cdf.main.asistencia = true
+            return [res3,chat] 
         case '4':
-            return res4 
+            return [res4,chat]
+        default:
+            return "🤔... Por favor indíca el numero correspondiente a la sección 😊"  
     }
 }
 

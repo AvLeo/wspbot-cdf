@@ -4,7 +4,7 @@ const msjCert = "👉Certificado👈\n\nGenial! Para poder consultar el estado d
 const msjCDF = "👉Casa del Futuro👈\n\n🔹1 - Talleres(horarios de cursado, metodología, duración, costo) \n🔹2 - Preinscripciones\n🔹3 - Atención personal\n🔹4 - Volver al menú inicial"
 const msjEDP = "👉Escuela de Programación👈\n\n🔹1 - Cursos(horarios de cursado, metodología, duración, costo) \n🔹2 - Preinscripciones\n🔹3 - Atención personal\n🔹4 - Volver al menú inicial"
 
-const redes = "😍Nuestas Redes😍\n\n🔹IG: link \n🔹FB: link \n🔹WEB: link"
+const redes = "😍Nuestas Redes😍\n\n🔹IG: https://www.instagram.com/casadelfuturo.godoycruz/?hl=es \n🔹FB: link \n🔹WEB: https://casa-del-futuro.vercel.app/"
 
 //const msjAsis = "Estás siendo redirigido con el personal de Casa del Futuro!\n\nEn breves serás atendido, espera unos minutos porfavor! Gracias por charlar conmigo un ratito 😒 "
 

@@ -79,16 +79,7 @@ Escuela de Programación:
 🔹3 - Atención personal
 🔹4 - Volver al menú inicial
 
-///                                    
-// LOS PROFES ANTES DE INGRESAR AL CURSO GENEREN PIN NUEVO pin() - actualiza los pines - y si alumno uso el pin lo borre desde el sheet
-
-
-
-
-// Lógica de asistencia
-
-   
-
+///
 
 */
 
@@ -155,10 +146,10 @@ client.on('message', async (message) => {
         if(ctx.state.edp.asistencia){
             await client.sendMessage(from,"Solicitud para asistencia de Escuela de programación")
             await client.sendMessage(from,"Espere unos minutos, ya será atendido por un asistente 😊")
-            return
+            return console.log(`${from} - Está esperando a ser atendido por un asistente `)
         }
-        const res = getResEDP(text)
-        await client.sendMessage(from,res)
+        const res = getResEDP(text,chat,id)
+        await client.sendMessage(from,res[0])
         if(text === '4'){
             chat[id].state.edp.main = false
             await client.sendMessage(from,msjInicial)
@@ -172,20 +163,27 @@ client.on('message', async (message) => {
         if(ctx.state.cdf.asistencia){
             await client.sendMessage(from,"Solicitud para asistencia de Escuela de programación")
             await client.sendMessage(from,"Espere unos minutos, ya será atendido por un asistente 😊")
-            return
+            return console.log(`${from} - Está esperando a ser atendido por un asistente `)
         }
-        const res = getResCDF(text)
-        await client.sendMessage(from,res)
+        const res = getResCDF(text,chat,id)
+        await client.sendMessage(from,res[0])
         if(text === '4'){
             chat[id].state.cdf.main = false
             await client.sendMessage(from,msjInicial)
             console.log(chat[id])
         }
-        
+        await message.clearNotification
         return
     }
 
     if(text === '1' || text === '2' || text === '3' || text === '4' || text === '5'){
+
+        // TEMPORAL 
+        if(text === '2'){
+            await client.sendMessage(from, "Proximamente podrás averiguar el estado de tu certificado! 😎")
+            return
+        }
+        //
         const res = initialFLow(text,chat,id)
         await client.sendMessage(from,res[0])
         console.log(chat[id])

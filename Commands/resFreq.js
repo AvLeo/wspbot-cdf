@@ -28,7 +28,8 @@ const getResFreq = (msj) => {
             return res8 
         case '9':
             return res9 
-                    
+        default:
+            return "🤔... Por favor indíca el numero correspondiente a la sección 😊" 
     }
 }
 
