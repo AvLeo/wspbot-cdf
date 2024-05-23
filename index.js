@@ -9,7 +9,12 @@ const { getResEDP } = require('./Commands/resEDP.js')
 const { getResCDF } = require('./Commands/resCDF.js')
 
 const client = new Client({
-    authStrategy: new LocalAuth()
+    authStrategy: new LocalAuth(),
+    webVersion: '2.2409.2',
+  webVersionCache: {
+    type: 'remote',
+    remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2409.2.html'
+  }
 })
 
 const { cel , redes} = require('./data.json')
@@ -99,6 +104,7 @@ client.on('message', async (message) => {
 
     let ctx;
 
+    // existe contexto de usuario
     if(typeof(isInit) !== "undefined"){
         ctx = isInit;
     }else{
@@ -121,19 +127,25 @@ client.on('message', async (message) => {
 
     }
 
+    //--- busca id del numero de wsp
     const id = chats.findIndex( chat => chat.numero === from )
 
+    //--- estado de frencuencia
     if(ctx.state.freq){
         const res = getResFreq(text)
         await client.sendMessage(from,res)
         if(text === '9'){
             await client.sendMessage(from,msjInicial)
             chat[id].state.freq = false
+            return
         } 
+        const initalMsg = initialFLow("1",chat,id )
+        await client.sendMessage(from, initalMsg[0])
         //fs.writeFile('chats.json',JSON.stringify(chat))
         return 
     }
 
+    // --- estado de certificado
     if(ctx.state.certificado){
         const res = getResCert(text)
         chat[id].state.certificado = false
@@ -142,11 +154,21 @@ client.on('message', async (message) => {
         return
     }
 
+    // ingresó a escuela de programación
     if(ctx.state.edp.main){
         if(ctx.state.edp.asistencia){
+            if(text === "2"){
+                await client.sendMessage(from,"Solicitud cancelada")
+                await client.sendMessage(from, msjInicial)
+                chat[id].state.cdf.asistencia = false
+                chat[id].state.cdf.main = false
+                return
+            }
+            console.log("out: ", chat[id])
             await client.sendMessage(from,"Solicitud para asistencia de Escuela de programación")
             await client.sendMessage(from,"Espere unos minutos, ya será atendido por un asistente 😊")
-            return console.log(`${from} - Está esperando a ser atendido por un asistente `)
+            await client.sendMessage(cel.LeoAvila,`${from.split('@')[0]} - Está esperando a ser atendido por un asistente `)
+            return
         }
         const res = getResEDP(text,chat,id)
         await client.sendMessage(from,res[0])
@@ -154,16 +176,30 @@ client.on('message', async (message) => {
             chat[id].state.edp.main = false
             await client.sendMessage(from,msjInicial)
             console.log(chat[id])
+            return
         }
-        
+        if(text === "3"){
+            const initalMsg = initialFLow("4",chat,id )
+            await client.sendMessage(from, initalMsg[0])
+        }
         return
     }
     
+    // --- estado de casa del futuro
     if(ctx.state.cdf.main){
         if(ctx.state.cdf.asistencia){
+            if(text === "2"){
+                await client.sendMessage(from,"Solicitud cancelada")
+                await client.sendMessage(from, msjInicial)
+                chat[id].state.cdf.asistencia = false
+                chat[id].state.cdf.main = false
+                return
+            }
+            console.log("out: ", chat[id])
             await client.sendMessage(from,"Solicitud para asistencia de Escuela de programación")
             await client.sendMessage(from,"Espere unos minutos, ya será atendido por un asistente 😊")
-            return console.log(`${from} - Está esperando a ser atendido por un asistente `)
+            await client.sendMessage(cel.LeoAvila,`${from.split('@')[0]} - Está esperando a ser atendido por un asistente `)
+            return
         }
         const res = getResCDF(text,chat,id)
         await client.sendMessage(from,res[0])
@@ -171,8 +207,13 @@ client.on('message', async (message) => {
             chat[id].state.cdf.main = false
             await client.sendMessage(from,msjInicial)
             console.log(chat[id])
+            return
         }
         await message.clearNotification
+        if( text === 3){
+            const initalMsg = initialFLow("3",chat,id )
+            await client.sendMessage(from, initalMsg[0])
+        }
         return
     }
 
@@ -193,6 +234,7 @@ client.on('message', async (message) => {
     client.sendMessage(from,"Hola soy el Asistente Virtual de Casa del Futuro 😊. \n\n Estoy para ayudar con los siguiente comandos:")
     client.sendMessage(from,msjInicial)
     //fs.writeFile('chats.json',JSON.stringify(chat))
+
 })
 
 client.initialize();

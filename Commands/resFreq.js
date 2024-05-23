@@ -1,4 +1,4 @@
-const res1 = "🔹 1 - Cursos" 
+const res1 = "🔹Casa del Futuro 🔹\n Mundos 3D: Día.... Horario... \n Animación 3D: Día.... Horario... \n Linux: Día.... Horario... \n  " 
 const res2 = "🔹 2 - Inscripciones "
 const res3 = "🔹 3 - Certificados "
 const res4 = "🔹 4 - Metodoligia de cursado" 

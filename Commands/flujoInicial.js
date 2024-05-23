@@ -24,7 +24,9 @@ const initialFLow = (msj, chat, id) => {
             return [msjEDP,chat]
         case '5': // Redes de contacto
             return [redes,chat]
-    }
+        default:
+            return ["Elegí bien qla", chat]
+        }
 }
 
 module.exports = {
