@@ -1,5 +1,5 @@
 const msjFreq = "👉Preguntas Frecuentes👈\n\n🔹1 - Cursos \n🔹2 - Inscripciones \n🔹3 - Certificados \n🔹4 - Metodoligia de cursado \n🔹5 - Duración de cursos \n🔹6 - Costo de cursado \n🔹7 - Escuela de Programación \n🔹8 - Redes \n🔹9 - Volver"
-const msjCert = "👉Certificado👈\n\nGenial! Para poder consultar el estado de tu certificado necesito lo siguiente:\n\nIngresa tu NOMBRE y APELLIDO, ejemplo: Pepito Perez"
+const msjCert = "👉Certificado👈\n\nGenial! Para poder consultar el estado de tu certificado necesito lo siguiente:\n\nIngresa tu N° DNI, ejemplo: 40321987"
 
 const msjCDF = "👉Casa del Futuro👈\n\n🔹1 - Talleres(horarios de cursado, metodología, duración, costo) \n🔹2 - Preinscripciones\n🔹3 - Atención personal\n🔹4 - Volver al menú inicial"
 const msjEDP = "👉Escuela de Programación👈\n\n🔹1 - Cursos(horarios de cursado, metodología, duración, costo) \n🔹2 - Preinscripciones\n🔹3 - Atención personal\n🔹4 - Volver al menú inicial"

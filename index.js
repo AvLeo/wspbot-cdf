@@ -1,6 +1,6 @@
 const qrcode = require('qrcode-terminal');
 const fs = require('fs')
-const { Client , LocalAuth} = require('whatsapp-web.js');
+const { Client , LocalAuth, MessageMedia} = require('whatsapp-web.js');
 
 const { initialFLow } = require('./Commands/flujoInicial.js')
 const { getResFreq } = require('./Commands/resFreq.js')
@@ -84,6 +84,18 @@ Escuela de Programación:
 🔹3 - Atención personal
 🔹4 - Volver al menú inicial
 
+
+
+La Tester Guillermina dice que se rompe en:
+
+- MSJ De Certificado ❓
+- MSJ En Solicitud de Asistencia - Volver a inicio si no lo quiere
+- Asistencia del Personal - CDF: Confirma con cualquier cosa != 2, EDP: Confirma con cualquier cosa != 2 y Manda msj demás
+- 
+-
+-
+-
+-
 ///
 
 */
@@ -147,10 +159,25 @@ client.on('message', async (message) => {
 
     // --- estado de certificado
     if(ctx.state.certificado){
-        const res = getResCert(text)
-        chat[id].state.certificado = false
-        await client.sendMessage(from,res)
-        await client.sendMessage(from,msjInicial)
+
+        const resPath = getResCert(text)
+
+        if(resPath === "exit"){
+            await client.sendMessage(from,"🔙 Volviendo 🏃‍♂️")
+            chat[id].state.certificado = false
+            await client.sendMessage(from,msjInicial)
+            return
+        }
+
+        if(resPath !== -1){
+            const media = MessageMedia.fromFilePath(resPath)
+            await client.sendMessage(from,media)
+            chat[id].state.certificado = false
+            await client.sendMessage(from,msjInicial)
+            return
+        }
+
+        await client.sendMessage(from,"😭 No hay certificado para este DNI \n\n 💠 Intenta con otro documento o asegura que esté bien escrito. \n\n 💠 Envia 1 para volver")
         return
     }
 
@@ -160,8 +187,8 @@ client.on('message', async (message) => {
             if(text === "2"){
                 await client.sendMessage(from,"Solicitud cancelada")
                 await client.sendMessage(from, msjInicial)
-                chat[id].state.cdf.asistencia = false
-                chat[id].state.cdf.main = false
+                chat[id].state.edp.asistencia = false
+                chat[id].state.edp.main = false
                 return
             }
             console.log("out: ", chat[id])
@@ -196,7 +223,7 @@ client.on('message', async (message) => {
                 return
             }
             console.log("out: ", chat[id])
-            await client.sendMessage(from,"Solicitud para asistencia de Escuela de programación")
+            await client.sendMessage(from,"Solicitud para asistencia de Casa del Futuro")
             await client.sendMessage(from,"Espere unos minutos, ya será atendido por un asistente 😊")
             await client.sendMessage(cel.LeoAvila,`${from.split('@')[0]} - Está esperando a ser atendido por un asistente `)
             return
@@ -219,12 +246,6 @@ client.on('message', async (message) => {
 
     if(text === '1' || text === '2' || text === '3' || text === '4' || text === '5'){
 
-        // TEMPORAL 
-        if(text === '2'){
-            await client.sendMessage(from, "Proximamente podrás averiguar el estado de tu certificado! 😎")
-            return
-        }
-        //
         const res = initialFLow(text,chat,id)
         await client.sendMessage(from,res[0])
         console.log(chat[id])
