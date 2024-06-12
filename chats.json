@@ -12,7 +12,8 @@
                 "cdf":{
                     "main": false,
                     "asistencia": false
-                }
+                },
+                "chat":false
             }
         }
         
